@@ -11,21 +11,71 @@
             font-family: 'Inter', sans-serif;
             background-color: #0f0c29;
             background-image: linear-gradient(to top, #302b63, #24243e, #0f0c29);
-            background-attachment: fixed;
+            background-attachment: fixed; /* Prevents gradient from scrolling */
         }
-        #app-container { position: relative; z-index: 1; }
-        #stars-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; }
-        .star { position: absolute; background-color: white; border-radius: 50%; animation-name: twinkle; animation-iteration-count: infinite; box-shadow: 0 0 4px #fff, 0 0 8px #fff; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }
-        .view { display: none; }
-        .view.active { display: block; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-overlay.active { display: flex; }
-        .character-card { transition: transform 0.2s, box-shadow 0.2s; }
-        .character-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(96, 165, 250, 0.5), 0 4px 6px -2px rgba(96, 165, 250, 0.25); }
-        .character-card.selected { transform: translateY(-5px) scale(1.05); box-shadow: 0 0 0 4px #3b82f6; }
-        .loader { width: 20px; height: 20px; border: 3px solid #FFF; border-bottom-color: transparent; border-radius: 50%; display: inline-block; box-sizing: border-box; animation: rotation 1s linear infinite; }
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #app-container {
+            position: relative;
+            z-index: 1;
+        }
+        #stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation-name: twinkle;
+            animation-iteration-count: infinite;
+            box-shadow: 0 0 4px #fff, 0 0 8px #fff;
+        }
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .view {
+            display: none;
+        }
+        .view.active {
+            display: block;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .character-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .character-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(96, 165, 250, 0.5), 0 4px 6px -2px rgba(96, 165, 250, 0.25);
+        }
+        .character-card.selected {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 0 4px #3b82f6; /* Blue border */
+        }
     </style>
 </head>
 <body class="text-white flex items-center justify-center min-h-screen p-4">
@@ -51,7 +101,7 @@
                 <button onclick="showView('teacher-view')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-lg transition-transform transform hover:scale-105">
                     <span id="teacher-btn-text"></span>
                 </button>
-                <button onclick="showView('join-quiz-view')" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-8 rounded-lg transition-transform transform hover:scale-105">
+                <button onclick="showCharacterSelection()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-8 rounded-lg transition-transform transform hover:scale-105">
                     <span id="student-btn-text"></span>
                 </button>
             </div>
@@ -106,39 +156,8 @@
                     <!-- Questions will be dynamically inserted here -->
                 </div>
             </div>
-            
-            <div class="mt-8 text-center">
-                <button onclick="publishQuiz()" id="publish-quiz-btn" class="flex justify-center items-center gap-2 w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 disabled:bg-gray-600 disabled:cursor-not-allowed">
-                </button>
-            </div>
         </div>
         
-        <!-- Token Display View (for Teacher) -->
-        <div id="token-display-view" class="view text-center bg-gray-800/80 backdrop-blur-sm p-8 rounded-2xl shadow-2xl">
-            <h1 id="token-success-title" class="text-3xl font-bold mb-4 text-green-400"></h1>
-            <p id="token-share-info" class="text-gray-300 mb-6"></p>
-            <div class="bg-gray-900/80 p-6 rounded-xl mb-8 inline-flex items-center gap-4">
-                <span id="quiz-token" class="text-4xl font-bold tracking-widest text-yellow-300"></span>
-                <button onclick="copyToken()" id="copy-token-btn" class="bg-blue-600 hover:bg-blue-700 p-3 rounded-lg">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                </button>
-            </div>
-            <div>
-                <button onclick="resetTeacherPanel()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg" id="create-new-quiz-btn"></button>
-            </div>
-        </div>
-
-        <!-- Join Quiz View (for Student) -->
-        <div id="join-quiz-view" class="view text-center bg-gray-800/80 backdrop-blur-sm p-8 rounded-2xl shadow-2xl">
-            <h1 id="join-title" class="text-3xl font-bold mb-6"></h1>
-            <form id="join-quiz-form">
-                <input type="text" id="token-input" class="w-full max-w-sm mx-auto bg-gray-700 border border-gray-600 text-white text-center rounded-lg p-4 text-2xl uppercase tracking-widest focus:ring-blue-500 focus:border-blue-500 mb-4" required>
-                <p id="join-error-msg" class="text-red-400 h-6 mb-4"></p>
-                <button type="submit" id="join-quiz-btn" class="flex justify-center items-center gap-2 w-full max-w-sm bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 disabled:bg-gray-600"></button>
-            </form>
-            <button onclick="showView('role-select-view')" class="mt-8 text-sm text-gray-400 hover:text-white" id="back-to-role-from-join-btn"></button>
-        </div>
-
         <!-- Character Selection View -->
         <div id="character-select-view" class="view bg-gray-800/80 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl text-center">
             <h1 id="character-title" class="text-3xl font-bold text-center mb-6"></h1>
@@ -156,7 +175,7 @@
                 <button id="start-quiz-btn" onclick="startQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 disabled:bg-gray-600 disabled:cursor-not-allowed disabled:transform-none" disabled>
                     <span id="start-quiz-btn-text">Mulai Kuis</span>
                 </button>
-                 <button onclick="showView('join-quiz-view')" class="mt-4 text-sm text-gray-400 hover:text-white block mx-auto" id="back-to-role-from-char-btn"></button>
+                 <button onclick="showView('role-select-view')" class="mt-4 text-sm text-gray-400 hover:text-white block mx-auto" id="back-to-role-from-char-btn"></button>
             </div>
         </div>
 
@@ -194,6 +213,13 @@
             </div>
         </div>
         
+        <!-- Error Message View -->
+        <div id="error-view" class="view text-center bg-red-900/80 backdrop-blur-sm border border-red-700 p-8 rounded-2xl shadow-2xl">
+            <h1 id="error-title" class="text-3xl font-bold mb-4"></h1>
+            <p id="error-message" class="text-red-200 mb-8"></p>
+            <button onclick="showView('role-select-view')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg" id="back-from-error-btn"></button>
+        </div>
+
     </div>
 
     <!-- Instructions Modal -->
@@ -209,26 +235,20 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script type="module">
-        // Import fungsi yang dibutuhkan dari Firebase SDK
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- GLOBAL VARIABLES & STATE ---
-        window.currentLanguage = 'id';
-        window.questions = []; // Untuk guru membuat kuis
-        window.studentQuestions = []; // Untuk siswa mengerjakan kuis
-        window.wronglyAnsweredQuestions = [];
-        window.retryQuestions = [];
-        window.currentQuestionIndex = 0;
-        window.score = 0;
-        window.maxRetries = 0;
-        window.selectedCharacter = null;
-        window.playerName = '';
-        window.isInRetryRound = false;
-        let db, auth; // Variabel untuk instance Firebase
+    <script>
+        // --- STATE MANAGEMENT ---
+        let currentLanguage = 'id';
+        let questions = [];
+        let wronglyAnsweredQuestions = [];
+        let retryQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let maxRetries = 0;
+        let selectedCharacter = null;
+        let playerName = '';
+        let isInRetryRound = false;
+
 
         // --- CHARACTERS ---
         const characters = [
@@ -243,70 +263,167 @@
             { id: 'ros', name: 'Kak Ros', img: 'https://i.ibb.co/GcvfC0T/kakros.png' },
             { id: 'opah', name: 'Opah', img: 'https://i.ibb.co/n6z7v4p/opah.png' },
         ];
-        
+
+        // --- DOM ELEMENTS ---
+        const views = document.querySelectorAll('.view');
+        const addQuestionForm = document.getElementById('add-question-form');
+        const questionListDiv = document.getElementById('question-list');
+        const instructionsModal = document.getElementById('instructions-modal');
+
         // --- TRANSLATIONS ---
         const translations = {
             id: {
-                roleTitle: "Pilih Peran Anda", teacherBtn: "Saya Guru (Buat Kuis)", studentBtn: "Saya Siswa (Ikut Kuis)", backToLang: "Kembali ke Pilih Bahasa", teacherTitle: "Panel Guru", instructionsBtn: "Panduan", backToRole: "Kembali", addQuestionTitle: "Tambah Soal Baru", questionLabel: "Teks Pertanyaan", optionPlaceholder: (opt) => `Pilihan ${opt}`, correctAnswerLabel: "Jawaban Benar", pointsLabel: "Poin", addQuestionBtn: "Tambah Soal", questionListTitle: "Daftar Soal", deleteBtn: "Hapus", publishBtn: "Selesaikan & Dapatkan Kode Kuis", tokenSuccessTitle: "Kuis Berhasil Dipublikasi!", tokenShareInfo: "Bagikan kode ini kepada siswa Anda untuk bergabung:", copyBtnTitle: "Salin Kode", copySuccessMsg: "Kode disalin!", createNewQuizBtn: "Buat Kuis Baru", joinTitle: "Masuk ke Ruang Kuis", tokenInputPlaceholder: "MASUKKAN KODE", joinQuizBtn: "Gabung", joiningText: "Mencari...", backToRoleFromJoin: "Kembali ke Pilih Peran", joinErrorMsg: "Kode salah atau kuis tidak ditemukan.", characterTitle: "Siapkan Dirimu!", playerNameLabel: "Masukkan Namamu", playerNamePlaceholder: "Contoh: Budi", startQuizBtn: "Mulai Kuis", backToRoleFromChar: "Kembali", quizTitle: "Kuis Sedang Berlangsung", retryRoundTitle: "Ronde Kesempatan Kedua!", progressText: (current, total) => `Soal ${current} dari ${total}`, retryProgressText: (current, total) => `Soal Bonus ${current} dari ${total}`, resultsTitle: "Kuis Selesai!", finalScore: "Skor Akhir", scoreDetails: (total, maxScore) => `Total Poin yang Diperoleh: ${total}/${maxScore}`, retryBtn: "Main Lagi", mainMenuBtn: "Menu Utama", modalTitle: "Panduan Penggunaan Aplikasi", modalContent: `<h3 class="font-bold text-xl mb-2 text-white">Untuk Guru:</h3><ol class="list-decimal list-inside space-y-2"><li>Pilih peran "Saya Guru".</li><li>Isi formulir untuk menambah soal satu per satu. Soal akan disimpan secara online.</li><li>Setelah semua soal ditambahkan, klik tombol "Selesaikan & Dapatkan Kode Kuis".</li><li>Bagikan kode yang muncul kepada siswa.</li></ol><h3 class="font-bold text-xl mt-6 mb-2 text-white">Untuk Siswa:</h3><ol class="list-decimal list-inside space-y-2"><li>Pilih peran "Saya Siswa".</li><li>Masukkan Kode Kuis yang diberikan oleh guru dari perangkat mana pun.</li><li>Masukkan namamu dan pilih karakter favoritmu.</li><li>Jawab semua pertanyaan hingga selesai.</li><li><b>Ronde Kesempatan Kedua:</b> Jika salah menjawab, soal-soal tersebut akan diulang di akhir sebagai ronde bonus untuk memperbaiki skormu.</li></ol>`
+                roleTitle: "Pilih Peran Anda",
+                teacherBtn: "Saya Guru (Buat Kuis)",
+                studentBtn: "Saya Siswa (Mulai Kuis)",
+                backToLang: "Kembali ke Pilih Bahasa",
+                teacherTitle: "Panel Guru",
+                instructionsBtn: "Panduan",
+                backToRole: "Kembali",
+                addQuestionTitle: "Tambah Soal Baru",
+                questionLabel: "Teks Pertanyaan",
+                optionPlaceholder: (opt) => `Pilihan ${opt}`,
+                correctAnswerLabel: "Jawaban Benar",
+                pointsLabel: "Poin",
+                addQuestionBtn: "Tambah Soal",
+                questionListTitle: "Daftar Soal",
+                deleteBtn: "Hapus",
+                characterTitle: "Siapkan Dirimu!",
+                playerNameLabel: "Masukkan Namamu",
+                playerNamePlaceholder: "Contoh: Budi",
+                startQuizBtn: "Mulai Kuis",
+                backToRoleFromChar: "Kembali ke Pilih Peran",
+                quizTitle: "Kuis Sedang Berlangsung",
+                retryRoundTitle: "Ronde Kesempatan Kedua!",
+                progressText: (current, total) => `Soal ${current} dari ${total}`,
+                retryProgressText: (current, total) => `Soal Bonus ${current} dari ${total}`,
+                resultsTitle: "Kuis Selesai!",
+                finalScore: "Skor Akhir",
+                scoreDetails: (total, maxScore) => `Total Poin yang Diperoleh: ${total}/${maxScore}`,
+                retryBtn: "Main Lagi",
+                mainMenuBtn: "Menu Utama",
+                errorTitle: "Oops!",
+                errorMessage: "Belum ada soal yang ditambahkan oleh guru. Silakan minta guru untuk membuat soal terlebih dahulu.",
+                backFromError: "Kembali ke Menu",
+                modalTitle: "Panduan Penggunaan Aplikasi",
+                modalContent: `
+                    <h3 class="font-bold text-xl mb-2 text-white">Untuk Guru:</h3>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>Pilih peran "Saya Guru".</li>
+                        <li>Isi formulir untuk menambah soal, pilihan jawaban, jawaban benar, dan poin.</li>
+                        <li>Klik "Tambah Soal". Soal akan muncul di daftar.</li>
+                        <li>Setelah selesai, informasikan siswa untuk memulai kuis.</li>
+                    </ol>
+                    <h3 class="font-bold text-xl mt-6 mb-2 text-white">Untuk Siswa:</h3>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>Pilih peran "Saya Siswa".</li>
+                        <li>Masukkan namamu dan pilih karakter favoritmu sebagai avatar.</li>
+                        <li>Klik "Mulai Kuis" jika tombol sudah aktif.</li>
+                        <li>Jawab semua pertanyaan hingga selesai.</li>
+                        <li><b>Ronde Kesempatan Kedua:</b> Jika kamu salah menjawab beberapa soal, soal-soal tersebut akan dikumpulkan, diacak, dan diberikan lagi di akhir sebagai ronde bonus untuk memperbaiki skormu.</li>
+                        <li>Kuota kesempatan: 1 soal bonus (jika kuis 10+ soal), 3 soal bonus (jika kuis 20+ soal).</li>
+                        <li>Setelah ronde bonus selesai (jika ada), kamu akan melihat halaman hasil dan skor akhirmu.</li>
+                    </ol>
+                `
             },
             en: {
-                roleTitle: "Select Your Role", teacherBtn: "I'm a Teacher (Create Quiz)", studentBtn: "I'm a Student (Join Quiz)", backToLang: "Back to Language Select", teacherTitle: "Teacher Panel", instructionsBtn: "Guide", backToRole: "Back", addQuestionTitle: "Add New Question", questionLabel: "Question Text", optionPlaceholder: (opt) => `Option ${opt}`, correctAnswerLabel: "Correct Answer", pointsLabel: "Points", addQuestionBtn: "Add Question", questionListTitle: "Question List", deleteBtn: "Delete", publishBtn: "Finish & Get Quiz Code", tokenSuccessTitle: "Quiz Published Successfully!", tokenShareInfo: "Share this code with your students to join:", copyBtnTitle: "Copy Code", copySuccessMsg: "Code copied!", createNewQuizBtn: "Create New Quiz", joinTitle: "Join Quiz Room", tokenInputPlaceholder: "ENTER CODE", joinQuizBtn: "Join", joiningText: "Joining...", backToRoleFromJoin: "Back to Role Select", joinErrorMsg: "Invalid code or quiz not found.", characterTitle: "Get Ready!", playerNameLabel: "Enter Your Name", playerNamePlaceholder: "Example: John", startQuizBtn: "Start Quiz", backToRoleFromChar: "Back", quizTitle: "Quiz in Progress", retryRoundTitle: "Second Chance Round!", progressText: (current, total) => `Question ${current} of ${total}`, retryProgressText: (current, total) => `Bonus Question ${current} of ${total}`, resultsTitle: "Quiz Finished!", finalScore: "Final Score", scoreDetails: (total, maxScore) => `Total Points Earned: ${total}/${maxScore}`, retryBtn: "Play Again", mainMenuBtn: "Main Menu", errorTitle: "Oops!", errorMessage: "No questions have been added by the teacher yet. Please ask the teacher to create the quiz first.", backFromError: "Back to Menu", modalTitle: "Application Guide", modalContent: `<h3 class="font-bold text-xl mb-2 text-white">For Teachers:</h3><ol class="list-decimal list-inside space-y-2"><li>Select the "I'm a Teacher" role.</li><li>Fill out the form to add questions. They will be saved online.</li><li>Once all questions are added, click "Finish & Get Quiz Code".</li><li>Share the generated code with your students.</li></ol><h3 class="font-bold text-xl mt-6 mb-2 text-white">For Students:</h3><ol class="list-decimal list-inside space-y-2"><li>Select the "I'm a Student" role.</li><li>Enter the Quiz Code from any device.</li><li>Enter your name and choose your favorite character.</li><li>Answer all the questions.</li><li><b>Second Chance Round:</b> Incorrectly answered questions will be repeated at the end as a bonus round.</li></ol>`
+                roleTitle: "Select Your Role",
+                teacherBtn: "I'm a Teacher (Create Quiz)",
+                studentBtn: "I'm a Student (Start Quiz)",
+                backToLang: "Back to Language Select",
+                teacherTitle: "Teacher Panel",
+                instructionsBtn: "Guide",
+                backToRole: "Back",
+                addQuestionTitle: "Add New Question",
+                questionLabel: "Question Text",
+                optionPlaceholder: (opt) => `Option ${opt}`,
+                correctAnswerLabel: "Correct Answer",
+                pointsLabel: "Points",
+                addQuestionBtn: "Add Question",
+                questionListTitle: "Question List",
+                deleteBtn: "Delete",
+                characterTitle: "Get Ready!",
+                playerNameLabel: "Enter Your Name",
+                playerNamePlaceholder: "Example: John",
+                startQuizBtn: "Start Quiz",
+                backToRoleFromChar: "Back to Role Select",
+                quizTitle: "Quiz in Progress",
+                retryRoundTitle: "Second Chance Round!",
+                progressText: (current, total) => `Question ${current} of ${total}`,
+                retryProgressText: (current, total) => `Bonus Question ${current} of ${total}`,
+                resultsTitle: "Quiz Finished!",
+                finalScore: "Final Score",
+                scoreDetails: (total, maxScore) => `Total Points Earned: ${total}/${maxScore}`,
+                retryBtn: "Play Again",
+                mainMenuBtn: "Main Menu",
+                errorTitle: "Oops!",
+                errorMessage: "No questions have been added by the teacher yet. Please ask the teacher to create the quiz first.",
+                backFromError: "Back to Menu",
+                modalTitle: "Application Guide",
+                modalContent: `
+                    <h3 class="font-bold text-xl mb-2 text-white">For Teachers:</h3>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>Select the "I'm a Teacher" role.</li>
+                        <li>Fill out the form to add a question, options, correct answer, and points.</li>
+                        <li>Click "Add Question". The question will appear in the list.</li>
+                        <li>Once done, inform the students to start the quiz.</li>
+                    </ol>
+                    <h3 class="font-bold text-xl mt-6 mb-2 text-white">For Students:</h3>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li>Select the "I'm a Student" role.</li>
+                        <li>Enter your name and choose your favorite character as an avatar.</li>
+                        <li>Click "Start Quiz" once the button is enabled.</li>
+                        <li>Answer all the questions until the end.</li>
+                        <li><b>Second Chance Round:</b> If you answer some questions incorrectly, those questions will be collected, shuffled, and given to you again at the end as a bonus round to improve your score.</li>
+                        <li>Bonus chances: 1 bonus question (for 10+ question quizzes), 3 bonus questions (for 20+ question quizzes).</li>
+                        <li>After the bonus round is complete (if any), you will see the results page with your final score.</li>
+                    </ol>
+                `
             }
         };
 
-        // --- FIREBASE SETUP ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "GANTI_DENGAN_API_KEY_ANDA",
-            authDomain: "GANTI_DENGAN_AUTH_DOMAIN_ANDA",
-            projectId: "GANTI_DENGAN_PROJECT_ID_ANDA",
-            storageBucket: "GANTI_DENGAN_STORAGE_BUCKET_ANDA",
-            messagingSenderId: "GANTI_DENGAN_MESSAGING_SENDER_ID_ANDA",
-            appId: "GANTI_DENGAN_APP_ID_ANDA"
-        };
-
-        async function initializeFirebase() {
-            try {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                console.log("Firebase berhasil diinisialisasi dan pengguna masuk secara anonim.");
-            } catch (error) {
-                console.error("Inisialisasi Firebase gagal:", error);
-                alert("Tidak dapat terhubung ke layanan kuis. Periksa koneksi internet Anda dan coba lagi.");
-            }
-        }
-        
         // --- FUNCTIONS ---
-        window.showView = function(viewId) {
-            document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+
+        function showView(viewId) {
+            views.forEach(view => view.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
             window.scrollTo(0, 0);
         }
         
-        window.setLanguage = function(lang) {
-            window.currentLanguage = lang;
+        function setLanguage(lang) {
+            currentLanguage = lang;
             const t = translations[lang];
-            // ... (Kode terjemahan UI lainnya tetap sama)
-            Object.keys(t).forEach(key => {
-                const el = document.getElementById(key);
-                if(el && typeof t[key] === 'string') el.innerText = t[key];
-            });
+
+            document.getElementById('role-title').innerText = t.roleTitle;
             document.getElementById('teacher-btn-text').innerText = t.teacherBtn;
             document.getElementById('student-btn-text').innerText = t.studentBtn;
+            document.getElementById('back-to-lang-btn').innerText = t.backToLang;
+            document.getElementById('teacher-title').innerText = t.teacherTitle;
+            document.getElementById('instructions-btn').innerText = t.instructionsBtn;
+            document.getElementById('back-to-role-btn').innerText = t.backToRole;
+            document.getElementById('add-question-title').innerText = t.addQuestionTitle;
+            document.getElementById('question-label').innerText = t.questionLabel;
             document.getElementById('option-a').placeholder = t.optionPlaceholder('A');
             document.getElementById('option-b').placeholder = t.optionPlaceholder('B');
             document.getElementById('option-c').placeholder = t.optionPlaceholder('C');
             document.getElementById('option-d').placeholder = t.optionPlaceholder('D');
-            document.getElementById('publish-quiz-btn').innerText = t.publishBtn;
-            document.getElementById('join-quiz-btn').innerText = t.joinQuizBtn;
-            document.getElementById('token-input').placeholder = t.tokenInputPlaceholder;
+            document.getElementById('correct-answer-label').innerText = t.correctAnswerLabel;
+            document.getElementById('points-label').innerText = t.pointsLabel;
+            document.getElementById('add-question-btn').innerText = t.addQuestionBtn;
+            document.getElementById('question-list-title').innerText = t.questionListTitle;
+            document.getElementById('character-title').innerText = t.characterTitle;
+            document.getElementById('player-name-label').innerText = t.playerNameLabel;
             document.getElementById('player-name').placeholder = t.playerNamePlaceholder;
             document.getElementById('start-quiz-btn-text').innerText = t.startQuizBtn;
+            document.getElementById('back-to-role-from-char-btn').innerText = t.backToRoleFromChar;
+            document.getElementById('quiz-title').innerText = t.quizTitle;
+            document.getElementById('results-title').innerText = t.resultsTitle;
+            document.getElementById('retry-btn').innerText = t.retryBtn;
+            document.getElementById('main-menu-btn').innerText = t.mainMenuBtn;
+            document.getElementById('error-title').innerText = t.errorTitle;
+            document.getElementById('error-message').innerText = t.errorMessage;
+            document.getElementById('back-from-error-btn').innerText = t.backFromError;
+            document.getElementById('modal-title').innerText = t.modalTitle;
             document.getElementById('modal-content').innerHTML = t.modalContent;
 
             renderQuestionList();
@@ -314,257 +431,259 @@
             showView('role-select-view');
         }
 
-        window.addQuestion = function(e) {
+        function addQuestion(e) {
             e.preventDefault();
-            const question = { id: Date.now(), text: document.getElementById('question-text').value, options: { A: document.getElementById('option-a').value, B: document.getElementById('option-b').value, C: document.getElementById('option-c').value, D: document.getElementById('option-d').value }, answer: document.getElementById('correct-answer').value, points: parseInt(document.getElementById('points').value, 10) };
-            window.questions.push(question);
-            e.target.reset(); document.getElementById('points').value = 10;
+            const question = {
+                id: Date.now(),
+                text: document.getElementById('question-text').value,
+                options: {
+                    A: document.getElementById('option-a').value,
+                    B: document.getElementById('option-b').value,
+                    C: document.getElementById('option-c').value,
+                    D: document.getElementById('option-d').value
+                },
+                answer: document.getElementById('correct-answer').value,
+                points: parseInt(document.getElementById('points').value, 10)
+            };
+            questions.push(question);
+            addQuestionForm.reset();
+            document.getElementById('points').value = 10;
             renderQuestionList();
         }
         
-        window.deleteQuestion = function(id) {
-            window.questions = window.questions.filter(q => q.id !== id);
+        function deleteQuestion(id) {
+            questions = questions.filter(q => q.id !== id);
             renderQuestionList();
         }
 
         function renderQuestionList() {
-            const questionListDiv = document.getElementById('question-list');
             questionListDiv.innerHTML = '';
-            document.getElementById('publish-quiz-btn').disabled = window.questions.length === 0;
-            if (window.questions.length === 0) {
-                questionListDiv.innerHTML = `<p class="text-gray-500 italic">${window.currentLanguage === 'id' ? 'Belum ada soal ditambahkan.' : 'No questions added yet.'}</p>`;
+            if (questions.length === 0) {
+                questionListDiv.innerHTML = `<p class="text-gray-500 italic">${currentLanguage === 'id' ? 'Belum ada soal ditambahkan.' : 'No questions added yet.'}</p>`;
                 return;
             }
-            window.questions.forEach((q, index) => {
+            questions.forEach((q, index) => {
                 const questionEl = document.createElement('div');
                 questionEl.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-start';
-                questionEl.innerHTML = `<div class="flex-1"><p class="font-semibold">${index + 1}. ${q.text}</p><p class="text-sm text-green-400 mt-1">${translations[window.currentLanguage].correctAnswerLabel}: ${q.answer} (${q.points} poin)</p></div><button onclick="deleteQuestion(${q.id})" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 text-sm rounded-md ml-4">${translations[window.currentLanguage].deleteBtn}</button>`;
+                questionEl.innerHTML = `
+                    <div class="flex-1">
+                        <p class="font-semibold">${index + 1}. ${q.text}</p>
+                        <p class="text-sm text-green-400 mt-1">${currentLanguage === 'id' ? 'Jawaban' : 'Answer'}: ${q.answer} (${q.points} ${currentLanguage === 'id' ? 'poin' : 'points'})</p>
+                    </div>
+                    <button onclick="deleteQuestion(${q.id})" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 text-sm rounded-md ml-4">
+                        ${translations[currentLanguage].deleteBtn}
+                    </button>
+                `;
                 questionListDiv.appendChild(questionEl);
             });
         }
         
-        function generateToken() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let token = '';
-            for (let i = 0; i < 6; i++) { token += chars.charAt(Math.floor(Math.random() * chars.length)); }
-            return token;
-        }
-
-        window.publishQuiz = async function() {
-            const btn = document.getElementById('publish-quiz-btn');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = `<span class="loader"></span>`;
-            
-            const token = generateToken();
-            try {
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                const quizDocRef = doc(db, `artifacts/${appId}/public/data/quizzes`, token);
-                await setDoc(quizDocRef, { questions: window.questions, createdAt: serverTimestamp() });
-
-                document.getElementById('quiz-token').innerText = token;
-                document.getElementById('copy-token-btn').title = translations[window.currentLanguage].copyBtnTitle;
-                showView('token-display-view');
-            } catch (e) {
-                console.error("Gagal menyimpan kuis ke Firestore", e);
-                alert(window.currentLanguage === 'id' ? 'Gagal mempublikasikan kuis. Periksa koneksi internet Anda.' : 'Failed to publish quiz. Check your internet connection.');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        }
-
-        window.copyToken = function() {
-            const tokenText = document.getElementById('quiz-token').innerText;
-            navigator.clipboard.writeText(tokenText).then(() => {
-                const copyBtn = document.getElementById('copy-token-btn');
-                const originalContent = copyBtn.innerHTML;
-                copyBtn.title = translations[window.currentLanguage].copySuccessMsg;
-                copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-                setTimeout(() => { copyBtn.innerHTML = originalContent; copyBtn.title = translations[window.currentLanguage].copyBtnTitle; }, 2000);
-            });
-        }
-
-        window.resetTeacherPanel = function() {
-            window.questions = [];
-            document.getElementById('add-question-form').reset();
-            renderQuestionList();
-            showView('teacher-view');
-        }
-
-        async function joinQuiz(e) {
-            e.preventDefault();
-            const btn = document.getElementById('join-quiz-btn');
-            const originalText = btn.innerText;
-            btn.disabled = true;
-            btn.innerHTML = `<span class="loader"></span> <span class="ml-2">${translations[window.currentLanguage].joiningText}</span>`;
-
-            const errorMsgEl = document.getElementById('join-error-msg');
-            errorMsgEl.innerText = '';
-            const token = document.getElementById('token-input').value.trim().toUpperCase();
-            if (!token) {
-                btn.disabled = false; btn.innerText = originalText;
-                return;
-            }
-
-            try {
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                const quizDocRef = doc(db, `artifacts/${appId}/public/data/quizzes`, token);
-                const docSnap = await getDoc(quizDocRef);
-
-                if (docSnap.exists()) {
-                    const quizData = docSnap.data();
-                    window.studentQuestions = quizData.questions;
-                    if (window.studentQuestions && window.studentQuestions.length > 0) {
-                        showCharacterSelection();
-                    } else {
-                        errorMsgEl.innerText = translations[window.currentLanguage].joinErrorMsg;
-                    }
-                } else {
-                    errorMsgEl.innerText = translations[window.currentLanguage].joinErrorMsg;
-                }
-            } catch (err) {
-                console.error("Gagal mengambil kuis dari Firestore", err);
-                errorMsgEl.innerText = translations[window.currentLanguage].joinErrorMsg;
-            } finally {
-                btn.disabled = false;
-                btn.innerText = originalText;
-            }
-        }
-        
         function renderCharacterSelection() {
-            const grid = document.getElementById('character-grid'); grid.innerHTML = '';
+            const grid = document.getElementById('character-grid');
+            grid.innerHTML = '';
             characters.forEach(char => {
                 const charEl = document.createElement('div');
                 charEl.className = 'text-center cursor-pointer p-2 bg-gray-700/80 rounded-lg character-card';
                 charEl.onclick = () => selectCharacter(char.id, charEl);
-                charEl.innerHTML = `<img src="${char.img}" alt="${char.name}" class="w-24 h-24 rounded-full mx-auto mb-2 bg-gray-600 object-cover border-2 border-gray-600"><p class="font-semibold">${char.name}</p>`;
+                charEl.innerHTML = `
+                    <img src="${char.img}" alt="${char.name}" class="w-24 h-24 rounded-full mx-auto mb-2 bg-gray-600 object-cover border-2 border-gray-600">
+                    <p class="font-semibold">${char.name}</p>
+                `;
                 grid.appendChild(charEl);
             });
         }
         
-        window.showCharacterSelection = function() {
+        function showCharacterSelection() {
+            if (questions.length === 0) {
+                showView('error-view');
+                return;
+            }
             document.getElementById('player-name').value = '';
             document.getElementById('start-quiz-btn').disabled = true;
-            window.selectedCharacter = null;
+            selectedCharacter = null;
             showView('character-select-view');
         }
 
         function selectCharacter(charId, element) {
-            window.selectedCharacter = characters.find(c => c.id === charId);
-            document.querySelectorAll('.character-card').forEach(card => card.classList.remove('selected'));
+            selectedCharacter = characters.find(c => c.id === charId);
+            
+            // Visual feedback for selection
+            const allCards = document.querySelectorAll('.character-card');
+            allCards.forEach(card => card.classList.remove('selected'));
             element.classList.add('selected');
+
             document.getElementById('start-quiz-btn').disabled = false;
         }
 
-        window.startQuiz = function() {
-            window.playerName = document.getElementById('player-name').value.trim() || window.selectedCharacter.name;
-            window.currentQuestionIndex = 0; window.score = 0; window.wronglyAnsweredQuestions = []; window.retryQuestions = []; window.isInRetryRound = false;
-            window.maxRetries = window.studentQuestions.length >= 20 ? 3 : (window.studentQuestions.length >= 10 ? 1 : 0);
-            window.studentQuestions.sort(() => Math.random() - 0.5);
+        function startQuiz() {
+            playerName = document.getElementById('player-name').value.trim();
+            if (playerName === '') {
+                playerName = selectedCharacter.name; // Default to character name if input is empty
+            }
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            wronglyAnsweredQuestions = [];
+            retryQuestions = [];
+            isInRetryRound = false;
+            
+            if (questions.length >= 20) {
+                maxRetries = 3;
+            } else if (questions.length >= 10) {
+                maxRetries = 1;
+            } else {
+                maxRetries = 0;
+            }
+
+            questions.sort(() => Math.random() - 0.5);
+            
             showView('student-view');
             displayQuestion();
         }
 
         function displayQuestion() {
-            const t = translations[window.currentLanguage];
-            const currentArray = window.isInRetryRound ? window.retryQuestions : window.studentQuestions;
-            const question = currentArray[window.currentQuestionIndex];
-            document.getElementById('quiz-avatar').src = window.selectedCharacter.img;
-            document.getElementById('player-name-display').innerText = window.playerName;
+            const t = translations[currentLanguage];
+            const currentQuizArray = isInRetryRound ? retryQuestions : questions;
+            const question = currentQuizArray[currentQuestionIndex];
+
+            document.getElementById('quiz-avatar').src = selectedCharacter.img;
+            document.getElementById('player-name-display').innerText = playerName;
             
-            if(window.isInRetryRound) {
+            if(isInRetryRound) {
                 document.getElementById('quiz-title').innerText = t.retryRoundTitle;
-                document.getElementById('quiz-progress').innerText = t.retryProgressText(window.currentQuestionIndex + 1, currentArray.length);
+                document.getElementById('quiz-progress').innerText = t.retryProgressText(currentQuestionIndex + 1, currentQuizArray.length);
                 document.getElementById('second-chance-info').style.display = 'none';
             } else {
                 document.getElementById('quiz-title').innerText = t.quizTitle;
-                document.getElementById('quiz-progress').innerText = t.progressText(window.currentQuestionIndex + 1, currentArray.length);
+                document.getElementById('quiz-progress').innerText = t.progressText(currentQuestionIndex + 1, currentQuizArray.length);
                 document.getElementById('second-chance-info').style.display = 'block';
-                document.getElementById('second-chance-info').innerText = `${window.currentLanguage === 'id' ? 'Kesempatan Bonus' : 'Bonus Chances'}: ${window.maxRetries}`;
+                document.getElementById('second-chance-info').innerText = `${currentLanguage === 'id' ? 'Kesempatan Bonus' : 'Bonus Chances'}: ${maxRetries}`;
             }
 
             document.getElementById('quiz-question').innerText = question.text;
-            const optionsDiv = document.getElementById('quiz-options'); optionsDiv.innerHTML = '';
+
+            const optionsDiv = document.getElementById('quiz-options');
+            optionsDiv.innerHTML = '';
             Object.keys(question.options).forEach(key => {
-                const button = document.createElement('button'); button.dataset.key = key;
+                const button = document.createElement('button');
+                button.dataset.key = key;
                 button.className = 'w-full text-left bg-gray-700 p-4 rounded-lg hover:bg-blue-600 transition-colors';
                 button.innerHTML = `<span class="font-bold mr-2">${key}.</span> ${question.options[key]}`;
-                button.onclick = () => selectAnswer(key); optionsDiv.appendChild(button);
+                button.onclick = () => selectAnswer(key);
+                optionsDiv.appendChild(button);
             });
         }
         
         function advanceQuiz() {
-            window.currentQuestionIndex++;
-            const currentArray = window.isInRetryRound ? window.retryQuestions : window.studentQuestions;
-            if (window.currentQuestionIndex < currentArray.length) { displayQuestion(); } 
-            else { window.isInRetryRound ? showResults() : initiateRetryRound(); }
+            currentQuestionIndex++;
+            
+            if (isInRetryRound) {
+                if (currentQuestionIndex < retryQuestions.length) {
+                    displayQuestion();
+                } else {
+                    showResults();
+                }
+            } else {
+                if (currentQuestionIndex < questions.length) {
+                    displayQuestion();
+                } else {
+                    initiateRetryRound();
+                }
+            }
         }
 
         function initiateRetryRound() {
-            if (window.wronglyAnsweredQuestions.length > 0 && window.maxRetries > 0) {
-                window.isInRetryRound = true;
-                window.wronglyAnsweredQuestions.sort(() => Math.random() - 0.5);
-                window.retryQuestions = window.wronglyAnsweredQuestions.slice(0, window.maxRetries);
-                window.currentQuestionIndex = 0;
+            if (wronglyAnsweredQuestions.length > 0 && maxRetries > 0) {
+                isInRetryRound = true;
+                wronglyAnsweredQuestions.sort(() => Math.random() - 0.5); // Shuffle
+                retryQuestions = wronglyAnsweredQuestions.slice(0, maxRetries);
+                currentQuestionIndex = 0;
                 displayQuestion();
-            } else { showResults(); }
+            } else {
+                showResults();
+            }
         }
 
         function selectAnswer(selectedOption) {
-            const currentArray = window.isInRetryRound ? window.retryQuestions : window.studentQuestions;
-            const question = currentArray[window.currentQuestionIndex];
+            const currentQuizArray = isInRetryRound ? retryQuestions : questions;
+            const question = currentQuizArray[currentQuestionIndex];
             const optionsDiv = document.getElementById('quiz-options');
             const buttons = optionsDiv.querySelectorAll('button');
-            const selectedBtn = optionsDiv.querySelector(`button[data-key="${selectedOption}"]`);
-            const correctBtn = optionsDiv.querySelector(`button[data-key="${question.answer}"]`);
+            const selectedButton = optionsDiv.querySelector(`button[data-key="${selectedOption}"]`);
+            const correctButton = optionsDiv.querySelector(`button[data-key="${question.answer}"]`);
 
-            buttons.forEach(b => { b.disabled = true; b.classList.remove('hover:bg-blue-600'); });
+            buttons.forEach(b => {
+                b.disabled = true;
+                b.classList.remove('hover:bg-blue-600');
+            });
 
             if (selectedOption === question.answer) {
-                window.score += question.points;
-                correctBtn.classList.remove('bg-gray-700'); correctBtn.classList.add('bg-green-600');
+                score += question.points;
+                correctButton.classList.remove('bg-gray-700');
+                correctButton.classList.add('bg-green-600');
             } else {
-                if (!window.isInRetryRound) { window.wronglyAnsweredQuestions.push(question); }
-                selectedBtn.classList.remove('bg-gray-700'); selectedBtn.classList.add('bg-red-600');
-                correctBtn.classList.remove('bg-gray-700'); correctBtn.classList.add('bg-green-600');
+                if (!isInRetryRound) {
+                     wronglyAnsweredQuestions.push(question);
+                }
+                selectedButton.classList.remove('bg-gray-700');
+                selectedButton.classList.add('bg-red-600');
+                correctButton.classList.remove('bg-gray-700');
+                correctButton.classList.add('bg-green-600');
             }
+            
             setTimeout(advanceQuiz, 1500);
         }
 
         function showResults() {
-            window.isInRetryRound = false; showView('results-view');
-            const totalPoints = window.studentQuestions.reduce((sum, q) => sum + q.points, 0);
-            document.getElementById('result-character-img').src = window.selectedCharacter.img;
-            document.getElementById('result-player-name').innerText = window.playerName;
-            document.getElementById('results-title').innerText = translations[window.currentLanguage].resultsTitle;
-            document.getElementById('final-score').innerText = `${window.score}`;
-            document.getElementById('score-details').innerText = translations[window.currentLanguage].scoreDetails(window.score, totalPoints);
+            isInRetryRound = false;
+            showView('results-view');
+            const totalPoints = questions.reduce((sum, q) => sum + q.points, 0);
+            document.getElementById('result-character-img').src = selectedCharacter.img;
+            document.getElementById('result-player-name').innerText = playerName;
+            document.getElementById('results-title').innerText = translations[currentLanguage].resultsTitle;
+            document.getElementById('final-score').innerText = `${score}`;
+            document.getElementById('score-details').innerText = translations[currentLanguage].scoreDetails(score, totalPoints);
         }
         
-        window.showInstructions = function() { document.getElementById('instructions-modal').classList.add('active'); }
-        window.closeInstructions = function() { document.getElementById('instructions-modal').classList.remove('active'); }
+        function showInstructions() {
+            instructionsModal.classList.add('active');
+        }
+
+        function closeInstructions() {
+            instructionsModal.classList.remove('active');
+        }
 
         function createStars() {
-            const container = document.getElementById('stars-container'); if (!container) return;
-            for (let i = 0; i < 200; i++) {
-                const star = document.createElement('div'); star.className = 'star';
-                const size = Math.random() * 2 + 1; star.style.width = `${size}px`; star.style.height = `${size}px`;
-                star.style.top = `${Math.random() * 100}%`; star.style.left = `${Math.random() * 100}%`;
-                const duration = Math.random() * 6 + 4; const delay = Math.random() * 6;
-                star.style.animationDuration = `${duration}s`; star.style.animationDelay = `${delay}s`;
+            const container = document.getElementById('stars-container');
+            if (!container) return;
+            const starCount = 200; 
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.left = `${Math.random() * 100}%`;
+                
+                const duration = Math.random() * 6 + 4; // between 4s and 10s
+                const delay = Math.random() * 6;
+                
+                star.style.animationDuration = `${duration}s`;
+                star.style.animationDelay = `${delay}s`;
                 star.style.animationTimingFunction = 'ease-in-out';
+                
                 container.appendChild(star);
             }
         }
 
         // --- EVENT LISTENERS ---
-        document.getElementById('add-question-form').addEventListener('submit', window.addQuestion);
-        document.getElementById('join-quiz-form').addEventListener('submit', joinQuiz);
+        addQuestionForm.addEventListener('submit', addQuestion);
 
         // --- INITIALIZATION ---
         createStars();
-        initializeFirebase();
     </script>
 </body>
 </html>
-
